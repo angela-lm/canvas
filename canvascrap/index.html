@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>刮刮乐</title>
+    <style>
+        canvas{
+            background-size: 200px 200px;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="400" height="400" id="myCanvas"></canvas>
+</body>
+<script>
+    var oCanvas = document.getElementById('myCanvas');
+    var ctx = oCanvas.getContext('2d');
+    var w = oCanvas.offsetWidth;
+    var h = oCanvas.offsetHeight;
+    var l = oCanvas.offsetLeft;
+    var t = oCanvas.offsetTop;
+    var lastX,lastY,newX,newY;
+    ctx.fillStyle = '#ccc';
+    ctx.fillRect(0,0,w,h);
+    ctx.globalCompositeOperation = 'destination-out';
+    var imgUrl = Math.ceil(Math.random() * 5);
+    var img = new Image();
+    img.src = 'image/' + imgUrl + '.jpg';
+    img.onload = function(){
+        oCanvas.style.backgroundImage = 'url(' + img.src + ')';
+    }
+    oCanvas.addEventListener('mousedown',startCrap);
+    function startCrap(e){
+        lastX = e.clientX - l;
+        lastY = e.clientY - t;
+        ctx.moveTo(lastX,lastY);
+        oCanvas.addEventListener('mousemove',startOpen);
+        document.addEventListener('mouseup',stopCrap);
+    }
+    function startOpen(e){
+        newX = e.clientX -l;
+        newY = e.clientY - t;
+
+        ctx.lineWidth = 30;
+        ctx.lineCap = 'round';
+        ctx.lineTo(newX,newY);
+        ctx.stroke();
+        lastX = newX;
+        lastY = newY;
+    }
+    function stopCrap(){
+        oCanvas.removeEventListener('mousemove',startOpen,false);
+        document.removeEventListener('mouseup',stopCrap,false);
+        showAll();        
+    }
+    function showAll(){
+        var c = 0;
+        var data = ctx.getImageData(100,100,w-200,h-200).data;
+        var len = data.length;
+        for(var i = 0;i < len; i+=4){
+            if(data[i] == 0){
+                c++;
+            }
+        }
+        console.log(c);
+        if(c >  (w - 200) * (h - 200) * 0.5){
+            ctx.fillRect(0,0,w,h);
+        }
+    }
+</script>
+</html>

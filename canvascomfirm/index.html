@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas confirm</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper{
+            margin: 100px 100px;
+            /* border: 1px solid #ccc; */
+        }
+        .wrapper .confirm{
+            width: 200px;
+            height: 40px;
+            text-indent: 20px;
+            line-height: 40px;
+            border: 1px solid #ccc;
+        }
+        .wrapper .tips{
+            margin-left:10px;
+        }
+        .wrapper .tips.tips-mistake{
+            color: red;
+        }
+        .wrapper .tips.tips-right{
+            color: yellow;
+        }
+        #myCanvas{
+            margin-top: 20px;
+            display: block;
+            border: 1px solid #ccc;
+            /* background-position: 10px 10px; */
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <input type="text" class="confirm" name="confirm" placeholder="请输入验证码"/>
+        <span class="tips"></span>
+        <canvas width="200" height="60" id="myCanvas"></canvas>
+    </div>
+
+</body>
+<script>
+    var oCanvas = document.getElementById('myCanvas');
+    var oInput = document.getElementsByClassName('confirm')[0];
+    var tips = document.getElementsByClassName('tips')[0];
+    var w = oCanvas.offsetWidth;
+    var h = oCanvas.offsetHeight;
+    var ctx = oCanvas.getContext('2d');
+    var color = ['red','yellow','blue','deeppink'];
+    var img = new Image();
+    img.src = '1.jpg';
+    function init(){
+        loadBg();
+        str = createText();
+        oCanvas.onclick = function(){
+            str = changeText();
+            console.log(str);
+        }
+        oInput.oninput = function(){
+            var val = oInput.value;
+            var len = val.length;
+            if(len == 4){
+                if(val == str){
+                    tips.innerText = '输入正确，正在跳转';
+                    tips.className ='tips tips-right';
+                }else{
+                    tips.innerText = '输入有误，请检查！'
+                    tips.className ='tips tips-mistake';                    
+                }
+            }else if(len > 4){
+                tips.innerText = '输入有误，请检查！'
+                tips.className ='tips tips-mistake'; 
+            }
+        }
+    }
+    init();
+    function loadBg(){
+        img.onload = function(){
+            var l = Math.ceil(Math.random() * 900);
+            var t = Math.ceil(Math.random() * 600);
+            oCanvas.style.backgroundImage = 'url(' + img.src +')';
+            oCanvas.style.backgroundPosition= l + "px " + t +"px";
+            oCanvas.style.backgroundSize = '100%';
+        }
+    }
+    function createText(){
+        var str = '';
+        var p = 0;
+        var l = Math.ceil(Math.random() * 20) + 30;
+        for(var i = 0; i < 4; i++){
+            var h = Math.round((Math.random() - 0.5) * 20);
+            var num = Math.floor(Math.random() * 10);
+            str += num.toString();
+            var colorNum = Math.floor(Math.random() * color.length);
+            ctx.fillStyle = color[colorNum];
+            ctx.font = '40px sans-serif';
+            ctx.fillText(num,l + p, 40 + h);
+            p += 30;
+        }
+        return str;
+    }
+    function changeText(){
+        loadBg();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillRect(0,0,w,h);
+        ctx.globalCompositeOperation = 'source-over';
+        str = createText();
+        return str;
+    }
+</script>
+</html>
